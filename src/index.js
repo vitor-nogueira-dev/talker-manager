@@ -3,6 +3,7 @@ const express = require('express');
 const files = require('./files');
 const generateToken = require('./helpers/generateToken');
 const validateUser = require('./middlewares/validateLogin');
+const { validateTalker } = require('./middlewares/validateTalker');
 
 const app = express();
 app.use(express.json());
@@ -35,6 +36,13 @@ app.post('/login', validateUser, async (req, res) => {
   return res.status(200).json({ token });
 });
 
+app.post('/talker', validateTalker, async (req, res) => {
+  const talkers = await files.readJsonFile();
+  const newTalker = { id: talkers.length + 1, ...req.body };
+  talkers.push(newTalker);
+  await files.writeJsonFile(talkers);
+  return res.status(201).json(newTalker);
+});
 
 app.listen(PORT, () => {
   console.log('Online');
