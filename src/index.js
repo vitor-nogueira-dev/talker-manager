@@ -2,6 +2,7 @@ const express = require('express');
 
 const files = require('./files');
 const generateToken = require('./helpers/generateToken');
+const validateUser = require('./middlewares/validateLogin');
 
 const app = express();
 app.use(express.json());
@@ -29,10 +30,12 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', validateUser, async (req, res) => {
   const token = generateToken();
   return res.status(200).json({ token });
 });
+
+
 app.listen(PORT, () => {
   console.log('Online');
 });
