@@ -3,7 +3,9 @@ const express = require('express');
 const files = require('./files');
 const generateToken = require('./helpers/generateToken');
 const validateUser = require('./middlewares/validateLogin');
-const { validateTalker } = require('./middlewares/validateTalker');
+const { validateTalker, validateAuth } = require('./middlewares/validateTalker');
+const errorHandle = require('./middlewares/error');
+const validateAuthenticator = require('./middlewares/validateAuth');
 
 const app = express();
 app.use(express.json());
@@ -57,6 +59,15 @@ app.put('/talker/:id', validateTalker, async (req, res) => {
   talkers[editTalker] = editedTalker;
   await files.writeJsonFile(talkers);
   return res.status(200).json(editedTalker);
+});
+
+app.delete('/talker/:id', validateAuthenticator, async (req, res) => {
+  const { id } = req.params;
+  const talkers = await files.readJsonFile();
+  const talkerIndex = talkers.findIndex((talker) => talker.id === +id);
+  talkers.splice(talkerIndex, 1);
+  await files.writeJsonFile(talkers);
+  return res.sendStatus(204);
 });
 
 app.listen(PORT, () => {
