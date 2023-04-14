@@ -82,11 +82,17 @@ const filterByNameAndDate = async (name, date) => {
 
   return result;
 };
+
+function findById(objectsList, id) {
+  return objectsList.find(obj => obj.id === id);
+}
+
 module.exports = {
   searchByName,
   searchByRate,
   searchByDate,
   searchByNameAndRate,
   searchMultiple,
-  filterByNameAndDate
+  filterByNameAndDate,
+  findById,
 }

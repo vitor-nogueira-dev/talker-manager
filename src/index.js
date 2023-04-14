@@ -7,7 +7,17 @@ const { validateTalker } = require('./middlewares/validateTalker');
 const validateAuthenticator = require('./middlewares/validateAuth');
 const validateRate = require('./middlewares/searchRate');
 const validateDate = require('./middlewares/validateDate');
-const { searchByName, searchByRate, searchByDate, searchByNameAndRate, searchMultiple, filterByNameAndDate } = require('./helpers/functions');
+
+const {
+  searchByName,
+  searchByRate,
+  searchByDate,
+  searchByNameAndRate,
+  searchMultiple,
+  filterByNameAndDate,
+} = require('./helpers/functions');
+const validateRatePatch = require('./middlewares/validateRatePatch');
+const { findById } = require('./helpers/functions');
 
 const app = express();
 app.use(express.json());
@@ -29,12 +39,12 @@ app.get(
     const talkersAll = await files.readJsonFile();
     const { q, rate, date } = req.query;
     if (q && rate && date) {
-      console.log('entrei')
+      console.log('entrei');
       const talkers = await searchMultiple(q, rate, date);
       return res.status(200).json(talkers);
     }
     if (q && rate) {
-      const talkers = await searchByNameAndRate(q, +rate)
+      const talkers = await searchByNameAndRate(q, +rate);
       return res.status(200).json(talkers);
     }
     if (date && q) {
@@ -55,7 +65,6 @@ app.get(
     }
     if (date === '') {
       return res.status(200).json(talkersAll);
-
     }
     return res.status(200).json([]);
   }
@@ -89,20 +98,25 @@ app.post('/talker', validateAuthenticator, validateTalker, async (req, res) => {
   return res.status(201).json(newTalker);
 });
 
-app.put('/talker/:id', validateAuthenticator, validateTalker, async (req, res) => {
-  const { id } = req.params;
-  const talkers = await files.readJsonFile();
-  const editTalker = talkers.findIndex((talker) => talker.id === +id);
-  if (editTalker === -1) {
-    return res
-      .status(404)
-      .json({ message: 'Pessoa palestrante não encontrada' });
+app.put(
+  '/talker/:id',
+  validateAuthenticator,
+  validateTalker,
+  async (req, res) => {
+    const { id } = req.params;
+    const talkers = await files.readJsonFile();
+    const editTalker = talkers.findIndex((talker) => talker.id === +id);
+    if (editTalker === -1) {
+      return res
+        .status(404)
+        .json({ message: 'Pessoa palestrante não encontrada' });
+    }
+    const editedTalker = { id: talkers[editTalker].id, ...req.body };
+    talkers[editTalker] = editedTalker;
+    await files.writeJsonFile(talkers);
+    return res.status(200).json(editedTalker);
   }
-  const editedTalker = { id: talkers[editTalker].id, ...req.body };
-  talkers[editTalker] = editedTalker;
-  await files.writeJsonFile(talkers);
-  return res.status(200).json(editedTalker);
-});
+);
 
 app.delete('/talker/:id', validateAuthenticator, async (req, res) => {
   const { id } = req.params;
@@ -112,6 +126,28 @@ app.delete('/talker/:id', validateAuthenticator, async (req, res) => {
   await files.writeJsonFile(talkers);
   return res.sendStatus(204);
 });
+
+app.patch(
+  '/talker/rate/:id',
+  validateAuthenticator,
+  validateRatePatch,
+  async (req, res) => {
+    const { id } = req.params;
+    const { rate } = req.body;
+    const talkers = await files.readJsonFile();
+
+    const talker = await findById(talkers, +id);
+    if (talker === -1) {
+      return res
+        .status(404)
+        .json({ message: 'Pessoa palestrante não encontrada' });
+    }
+
+    talker.talk.rate = rate;
+    await files.writeJsonFile([talker]);
+    return res.sendStatus(204);
+  }
+);
 
 app.listen(PORT, () => {
   console.log('Online', PORT);

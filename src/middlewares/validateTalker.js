@@ -41,7 +41,6 @@ const validateRate = (rate) => {
   if (!Number.isInteger(rate) || rate < 1 || rate > 5 || rate === 0) {
     throwError('O campo "rate" deve ser um número inteiro entre 1 e 5', 400);
   }
-
 };
 
 const validateTalk = (talk) => {
