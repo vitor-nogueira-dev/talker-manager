@@ -6,9 +6,8 @@ const validateUser = require('./middlewares/validateLogin');
 const { validateTalker } = require('./middlewares/validateTalker');
 const validateAuthenticator = require('./middlewares/validateAuth');
 const validateRate = require('./middlewares/searchRate');
-const {
-  validateSearchAndRate,
-} = require('./middlewares/searchAndRate');
+const validateDate = require('./middlewares/validateDate');
+const { searchByName, searchByRate, searchByDate, searchByNameAndRate, searchMultiple, filterByNameAndDate } = require('./helpers/functions');
 
 const app = express();
 app.use(express.json());
@@ -25,19 +24,40 @@ app.get(
   '/talker/search',
   validateAuthenticator,
   validateRate,
-  validateSearchAndRate,
+  validateDate,
   async (req, res) => {
-    const talkers = await files.readJsonFile();
-
-    const searchTerm = req.query.q;
-    if (!searchTerm) {
+    const talkersAll = await files.readJsonFile();
+    const { q, rate, date } = req.query;
+    if (q && rate && date) {
+      console.log('entrei')
+      const talkers = await searchMultiple(q, rate, date);
       return res.status(200).json(talkers);
-    } else {
-      const filteredTalkers = talkers.filter((talker) =>
-        talker.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      return res.status(200).json(filteredTalkers);
     }
+    if (q && rate) {
+      const talkers = await searchByNameAndRate(q, +rate)
+      return res.status(200).json(talkers);
+    }
+    if (date && q) {
+      const talkers = await filterByNameAndDate(q, date);
+      return res.status(200).json(talkers);
+    }
+    if (q || q === '') {
+      const talkers = await searchByName(q);
+      return res.status(200).json(talkers);
+    }
+    if (rate) {
+      const talkers = await searchByRate(+rate);
+      return res.status(200).json(talkers);
+    }
+    if (date) {
+      const talkers = await searchByDate(date);
+      return res.status(200).json(talkers);
+    }
+    if (date === '') {
+      return res.status(200).json(talkersAll);
+
+    }
+    return res.status(200).json([]);
   }
 );
 
@@ -61,7 +81,7 @@ app.post('/login', validateUser, async (req, res) => {
   return res.status(200).json({ token });
 });
 
-app.post('/talker', validateTalker, async (req, res) => {
+app.post('/talker', validateAuthenticator, validateTalker, async (req, res) => {
   const talkers = await files.readJsonFile();
   const newTalker = { id: talkers.length + 1, ...req.body };
   talkers.push(newTalker);
@@ -69,7 +89,7 @@ app.post('/talker', validateTalker, async (req, res) => {
   return res.status(201).json(newTalker);
 });
 
-app.put('/talker/:id', validateTalker, async (req, res) => {
+app.put('/talker/:id', validateAuthenticator, validateTalker, async (req, res) => {
   const { id } = req.params;
   const talkers = await files.readJsonFile();
   const editTalker = talkers.findIndex((talker) => talker.id === +id);
@@ -94,5 +114,5 @@ app.delete('/talker/:id', validateAuthenticator, async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log('Online');
+  console.log('Online', PORT);
 });

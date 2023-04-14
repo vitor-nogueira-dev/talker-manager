@@ -1,20 +1,9 @@
-// const validator = require('validator');
 const throwError = (message, status) => {
   const err = new Error(message);
   err.status = status;
   throw err;
 };
 
-const validateAuth = (req) => {
-  const { authorization } = req.headers;
-  const tokenRegExp = /[a-z0-9]{16}/i;
-
-  if (!authorization) throwError('Token não encontrado', 401);
-
-  if (!authorization.match(tokenRegExp) || authorization.length !== 16) {
-    throwError('Token inválido', 401);
-  }
-};
 const validateName = (name) => {
   if (!name) throwError('O campo "name" é obrigatório', 400);
   if (name.length < 3) {
@@ -68,7 +57,6 @@ const validateTalker = (req, res, next) => {
   try {
     const { name, age, talk } = req.body;
 
-    validateAuth(req);
     validateName(name);
     validateAge(age);
     validateTalk(talk);
@@ -79,4 +67,4 @@ const validateTalker = (req, res, next) => {
   }
 };
 
-module.exports = { validateTalker, validateAuth };
+module.exports = { validateTalker };
