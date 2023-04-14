@@ -44,6 +44,21 @@ app.post('/talker', validateTalker, async (req, res) => {
   return res.status(201).json(newTalker);
 });
 
+app.put('/talker/:id', validateTalker, async (req, res) => {
+  const { id } = req.params;
+  const talkers = await files.readJsonFile();
+  const editTalker = talkers.findIndex((talker) => talker.id === +id);
+  if (editTalker === -1) {
+    return res
+      .status(404)
+      .json({ message: 'Pessoa palestrante não encontrada' });
+  }
+  const editedTalker = { id: talkers[editTalker].id, ...req.body };
+  talkers[editTalker] = editedTalker;
+  await files.writeJsonFile(talkers);
+  return res.status(200).json(editedTalker);
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
