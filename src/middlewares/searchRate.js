@@ -1,5 +1,5 @@
 const files = require('../files');
-const searchByNameAndRate = require('./validateSearchAndRate');
+const searchByNameAndRate = require('./searchAndRate');
 
 const validateRate = async (req, res, next) => {
   const { q, rate } = req.query;

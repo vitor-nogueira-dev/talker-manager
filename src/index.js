@@ -5,10 +5,10 @@ const generateToken = require('./helpers/generateToken');
 const validateUser = require('./middlewares/validateLogin');
 const { validateTalker } = require('./middlewares/validateTalker');
 const validateAuthenticator = require('./middlewares/validateAuth');
-const validateRate = require('./middlewares/validateSearch');
+const validateRate = require('./middlewares/searchRate');
 const {
   validateSearchAndRate,
-} = require('./middlewares/validateSearchAndRate');
+} = require('./middlewares/searchAndRate');
 
 const app = express();
 app.use(express.json());
