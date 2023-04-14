@@ -5,6 +5,10 @@ const generateToken = require('./helpers/generateToken');
 const validateUser = require('./middlewares/validateLogin');
 const { validateTalker } = require('./middlewares/validateTalker');
 const validateAuthenticator = require('./middlewares/validateAuth');
+const validateRate = require('./middlewares/validateSearch');
+const {
+  validateSearchAndRate,
+} = require('./middlewares/validateSearchAndRate');
 
 const app = express();
 app.use(express.json());
@@ -17,19 +21,25 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-app.get('/talker/search', validateAuthenticator, async (req, res) => {
-  const talkers = await files.readJsonFile();
+app.get(
+  '/talker/search',
+  validateAuthenticator,
+  validateRate,
+  validateSearchAndRate,
+  async (req, res) => {
+    const talkers = await files.readJsonFile();
 
-  const searchTerm = req.query.q;
-  if (!searchTerm) { 
-    return res.status(200).json(talkers);
-  } else {
-    const filteredTalkers = talkers.filter((talker) =>
-      talker.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    return res.status(200).json(filteredTalkers);
+    const searchTerm = req.query.q;
+    if (!searchTerm) {
+      return res.status(200).json(talkers);
+    } else {
+      const filteredTalkers = talkers.filter((talker) =>
+        talker.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      return res.status(200).json(filteredTalkers);
+    }
   }
-});
+);
 
 app.get('/talker', async (_req, res) => {
   const result = await files.readJsonFile();
