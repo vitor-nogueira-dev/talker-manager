@@ -3,8 +3,7 @@ const express = require('express');
 const files = require('./files');
 const generateToken = require('./helpers/generateToken');
 const validateUser = require('./middlewares/validateLogin');
-const { validateTalker, validateAuth } = require('./middlewares/validateTalker');
-const errorHandle = require('./middlewares/error');
+const { validateTalker } = require('./middlewares/validateTalker');
 const validateAuthenticator = require('./middlewares/validateAuth');
 
 const app = express();
@@ -16,6 +15,20 @@ const PORT = process.env.PORT || '3001';
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
+});
+
+app.get('/talker/search', validateAuthenticator, async (req, res) => {
+  const talkers = await files.readJsonFile();
+
+  const searchTerm = req.query.q;
+  if (!searchTerm) { 
+    return res.status(200).json(talkers);
+  } else {
+    const filteredTalkers = talkers.filter((talker) =>
+      talker.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    return res.status(200).json(filteredTalkers);
+  }
 });
 
 app.get('/talker', async (_req, res) => {

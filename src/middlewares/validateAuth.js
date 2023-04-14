@@ -1,4 +1,4 @@
-const validateAuthenticator = (req, res) => {
+const validateAuthenticator = (req, res, next) => {
   const { authorization } = req.headers;
   const tokenRegExp = /[a-z0-9]{16}/i;
 
