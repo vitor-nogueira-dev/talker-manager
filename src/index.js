@@ -8,18 +8,12 @@ const validateAuthenticator = require('./middlewares/validateAuth');
 const validateRate = require('./middlewares/searchRate');
 const validateDate = require('./middlewares/validateDate');
 
-const {
-  searchByName,
-  searchByRate,
-  searchByDate,
-  searchByNameAndRate,
-  searchMultiple,
-  filterByNameAndDate,
-  refactorData,
-} = require('./helpers/functions');
+const { refactorData } = require('./helpers/functions');
 const validateRatePatch = require('./middlewares/validateRatePatch');
 const { findById } = require('./helpers/functions');
 const { findAll } = require('./db/talkerDB');
+const searchOptions = require('./helpers/searchOptions');
+const validateSearch = require('./middlewares/validateSearch');
 
 const app = express();
 app.use(express.json());
@@ -35,51 +29,72 @@ app.get('/', (_request, response) => {
 app.get(
   '/talker/search',
   validateAuthenticator,
+  validateSearch,
   validateRate,
   validateDate,
   async (req, res) => {
     const talkersAll = await files.readJsonFile();
     const { q, rate, date } = req.query;
-    if (q && rate && date) {
-      console.log('entrei');
-      const talkers = await searchMultiple(q, rate, date);
-      return res.status(200).json(talkers);
+    if (!q && !rate && !date) {
+      return res.status(200).json(talkersAll);
     }
-    if (q && rate) {
-      const talkers = await searchByNameAndRate(q, +rate);
-      return res.status(200).json(talkers);
-    }
-    if (date && q) {
-      const talkers = await filterByNameAndDate(q, date);
-      return res.status(200).json(talkers);
-    }
-    if (q || q === '') {
-      const talkers = await searchByName(q);
-      return res.status(200).json(talkers);
-    }
-    if (rate) {
-      const talkers = await searchByRate(+rate);
-      return res.status(200).json(talkers);
-    }
-    if (date) {
-      const talkers = await searchByDate(date);
-      return res.status(200).json(talkers);
-    }
+    
     if (date === '') {
       return res.status(200).json(talkersAll);
     }
-    return res.status(200).json([]);
-  }
+  
+    const { action } = searchOptions.find(({ test }) => test(q, rate, date));
+    console.log(action, 'action');
+
+    const talkers = await action(q, rate, date);
+
+    console.log(talkers, 'talkers');
+    return res.status(200).json(talkers);
+  },
+
+  // async (req, res) => {
+  //   const talkersAll = await files.readJsonFile();
+  //   const { q, rate, date } = req.query;
+  //   if (q && rate && date) {
+  //     console.log('entrei');
+  //     const talkers = await searchMultiple(q, rate, date);
+  //     return res.status(200).json(talkers);
+  //   }
+  //   if (q && rate) {
+  //     const talkers = await searchByNameAndRate(q, +rate);
+  //     return res.status(200).json(talkers);
+  //   }
+  //   if (date && q) {
+  //     const talkers = await filterByNameAndDate(q, date);
+  //     return res.status(200).json(talkers);
+  //   }
+  //   if (q || q === '') {
+  //     const talkers = await searchByName(q);
+  //     return res.status(200).json(talkers);
+  //   }
+  //   if (rate) {
+  //     const talkers = await searchByRate(+rate);
+  //     return res.status(200).json(talkers);
+  //   }
+  //   if (date) {
+  //     const talkers = await searchByDate(date);
+  //     return res.status(200).json(talkers);
+  //   }
+  //   if (date === '') {
+  //     return res.status(200).json(talkersAll);
+  //   }
+  //   return res.status(200).json([]);
+  // },
 );
 
 app.get('/talker/db', async (req, res) => {
   const [talkers] = await findAll();
-  const newArray = talkers.map(obj => refactorData(obj));
+  const newArray = talkers.map((obj) => refactorData(obj));
   if (newArray.length === 0) {
     return res.status(200).json([]);
   }
   return res.status(200).json(newArray);
-})
+});
 
 app.get('/talker', async (_req, res) => {
   const result = await files.readJsonFile();
@@ -126,7 +141,7 @@ app.put(
     talkers[editTalker] = editedTalker;
     await files.writeJsonFile(talkers);
     return res.status(200).json(editedTalker);
-  }
+  },
 );
 
 app.delete('/talker/:id', validateAuthenticator, async (req, res) => {
@@ -157,7 +172,7 @@ app.patch(
     talker.talk.rate = rate;
     await files.writeJsonFile([talker]);
     return res.sendStatus(204);
-  }
+  },
 );
 
 app.listen(3001, () => {
