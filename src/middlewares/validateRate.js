@@ -5,6 +5,7 @@ const validateRate = async (req, res, next) => {
       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
     });
   }
+
   return next();
 };
 

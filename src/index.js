@@ -8,11 +8,10 @@ const validateAuthenticator = require('./middlewares/validateAuth');
 const validateRate = require('./middlewares/validateRate');
 const validateDate = require('./middlewares/validateDate');
 
-const { refactorData } = require('./helpers/functions');
+const { refactorData, searchMultiple } = require('./helpers/functions');
 const validateRatePatch = require('./middlewares/validateRatePatch');
 const { findById } = require('./helpers/functions');
 const { findAll } = require('./db/talkerDB');
-const searchOptions = require('./helpers/searchOptions');
 const validateSearch = require('./middlewares/validateSearch');
 
 const app = express();
@@ -41,9 +40,8 @@ app.get(
     if (date === '') {
       return res.status(200).json(talkersAll);
     }
-    const { action } = searchOptions.find(({ search }) => search(q, +rate, date));
     
-    const talkers = await action(q, +rate, date);
+    const talkers = await searchMultiple(q, +rate, date);
 
     return res.status(200).json(talkers);
   },
