@@ -17,7 +17,7 @@ const validateAge = (age) => {
   if (!Number.isInteger(age) || age < 18) {
     throwError(
       'O campo "age" deve ser um número inteiro igual ou maior que 18',
-      400,
+      400
     );
   }
 };
@@ -36,7 +36,8 @@ const validateWatchedAt = (watchedAt) => {
 };
 
 const validateRate = (rate) => {
-  if (rate === undefined || rate === null) throwError('O campo "rate" é obrigatório', 400);
+  if (rate === undefined || rate === null)
+    throwError('O campo "rate" é obrigatório', 400);
 
   if (!Number.isInteger(rate) || rate < 1 || rate > 5 || rate === 0) {
     throwError('O campo "rate" deve ser um número inteiro entre 1 e 5', 400);

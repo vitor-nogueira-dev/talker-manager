@@ -15,9 +15,11 @@ const {
   searchByNameAndRate,
   searchMultiple,
   filterByNameAndDate,
+  refactorData,
 } = require('./helpers/functions');
 const validateRatePatch = require('./middlewares/validateRatePatch');
 const { findById } = require('./helpers/functions');
+const { findAll } = require('./db/talkerDB');
 
 const app = express();
 app.use(express.json());
@@ -69,6 +71,15 @@ app.get(
     return res.status(200).json([]);
   }
 );
+
+app.get('/talker/db', async (req, res) => {
+  const [talkers] = await findAll();
+  const newArray = talkers.map(obj => refactorData(obj));
+  if (newArray.length === 0) {
+    return res.status(200).json([]);
+  }
+  return res.status(200).json(newArray);
+})
 
 app.get('/talker', async (_req, res) => {
   const result = await files.readJsonFile();
@@ -149,6 +160,6 @@ app.patch(
   }
 );
 
-app.listen(PORT, () => {
+app.listen(3001, () => {
   console.log('Online', PORT);
 });
