@@ -35,11 +35,10 @@ const validateWatchedAt = (watchedAt) => {
   validateDate(watchedAt);
 };
 
-// eslint-disable-next-line complexity
 const validateRate = (rate) => {
   if (rate === undefined) { throwError('O campo "rate" é obrigatório', 400); }
 
-  if (!Number.isInteger(rate) || rate < 1 || rate > 5 || rate === 0) {
+  if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
     throwError('O campo "rate" deve ser um número inteiro entre 1 e 5', 400);
   }
 };
