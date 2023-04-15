@@ -5,7 +5,7 @@ const generateToken = require('./helpers/generateToken');
 const validateUser = require('./middlewares/validateLogin');
 const { validateTalker } = require('./middlewares/validateTalker');
 const validateAuthenticator = require('./middlewares/validateAuth');
-const validateRate = require('./middlewares/searchRate');
+const validateRate = require('./middlewares/validateRate');
 const validateDate = require('./middlewares/validateDate');
 
 const { refactorData } = require('./helpers/functions');
@@ -38,53 +38,15 @@ app.get(
     if (!q && !rate && !date) {
       return res.status(200).json(talkersAll);
     }
-    
     if (date === '') {
       return res.status(200).json(talkersAll);
     }
-  
-    const { action } = searchOptions.find(({ search }) => search(q, rate, date));
-    console.log(action, 'action');
+    const { action } = searchOptions.find(({ search }) => search(q, +rate, date));
+    
+    const talkers = await action(q, +rate, date);
 
-    const talkers = await action(q, rate, date);
-
-    console.log(talkers, 'talkers');
     return res.status(200).json(talkers);
   },
-
-  // async (req, res) => {
-  //   const talkersAll = await files.readJsonFile();
-  //   const { q, rate, date } = req.query;
-  //   if (q && rate && date) {
-  //     console.log('entrei');
-  //     const talkers = await searchMultiple(q, rate, date);
-  //     return res.status(200).json(talkers);
-  //   }
-  //   if (q && rate) {
-  //     const talkers = await searchByNameAndRate(q, +rate);
-  //     return res.status(200).json(talkers);
-  //   }
-  //   if (date && q) {
-  //     const talkers = await filterByNameAndDate(q, date);
-  //     return res.status(200).json(talkers);
-  //   }
-  //   if (q || q === '') {
-  //     const talkers = await searchByName(q);
-  //     return res.status(200).json(talkers);
-  //   }
-  //   if (rate) {
-  //     const talkers = await searchByRate(+rate);
-  //     return res.status(200).json(talkers);
-  //   }
-  //   if (date) {
-  //     const talkers = await searchByDate(date);
-  //     return res.status(200).json(talkers);
-  //   }
-  //   if (date === '') {
-  //     return res.status(200).json(talkersAll);
-  //   }
-  //   return res.status(200).json([]);
-  // },
 );
 
 app.get('/talker/db', async (req, res) => {
