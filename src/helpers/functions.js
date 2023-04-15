@@ -1,14 +1,14 @@
 const { readJsonFile } = require('../files');
 
-const searchByName = async (name) => {
+const searchByName = async (name, _rate, _date) => {
   const talkers = await readJsonFile();
   return talkers.filter((talker) =>
     talker.name.toLowerCase().includes(name.toLowerCase()));
 };
 
-const searchByRate = async (rating) => {
+const searchByRate = async (_q, rate, _date) => {
   const talkers = await readJsonFile();
-  return talkers.filter(({ talk }) => talk.rate === rating);
+  return talkers.filter(({ talk }) => talk.rate === +rate);
 };
 
 const convertDate = (date) => {
@@ -18,7 +18,7 @@ const convertDate = (date) => {
   }
 };
 
-const searchByDate = async (date) => {
+const searchByDate = async (_q, _rate, date) => {
   const talkers = await readJsonFile();
   const filteredTalkers = talkers.filter(({ talk }) => {
     const searchDate = convertDate(date);
@@ -32,7 +32,7 @@ const searchByDate = async (date) => {
   return filteredTalkers;
 };
 
-const searchByNameAndRate = async (name, rate) => {
+const searchByNameAndRate = async (name, rate, _date) => {
   const talkers = await readJsonFile();
   return talkers.filter(
     (talker) =>
@@ -66,7 +66,7 @@ const searchMultiple = async (name, rate, date) => {
   return filterByMultipleProps(name, +rate, converterDate);
 };
 
-const filterByNameAndDate = async (name, date) => {
+const filterByNameAndDate = async (name, _rate, date) => {
   const talkers = await readJsonFile();
   const convertedDate = convertDate(date);
 
