@@ -14,22 +14,22 @@ module.exports = [
   },
   {
     search: (q, rate, _date) => q && rate,
-    action: (q, rate) => searchByNameAndRate(q, +rate),
+    action: (q, rate, date) => searchByNameAndRate(q, +rate, date),
   },
   {
     search: (q, _rate, date) => q && date,
-    action: (q, date) => filterByNameAndDate(q, date),
+    action: (q, rate, date) => filterByNameAndDate(q, rate, date),
   },
   {
     search: (q, _rate, _date) => q || q === '',
-    action: (q) => searchByName(q),
+    action: (q, rate, date) => searchByName(q, rate, date),
   },
   {
-    search: (_q, rate, _date) => rate,
-    action: (rate) => searchByRate(+rate),
+    search: (q, rate, _date) => rate,
+    action: (q, rate, date) => searchByRate(q, rate, date),
   },
   {
     search: (_q, _rate, date) => date,
-    action: (date) => searchByDate(date),
+    action: (q, rate, date) => searchByDate(q, rate, date),
   },
 ];
