@@ -3,8 +3,7 @@ const { readJsonFile } = require('../files');
 const searchByName = async (name) => {
   const talkers = await readJsonFile();
   return talkers.filter((talker) =>
-    talker.name.toLowerCase().includes(name.toLowerCase())
-  );
+    talker.name.toLowerCase().includes(name.toLowerCase()));
 };
 
 const searchByRate = async (rating) => {
@@ -13,8 +12,10 @@ const searchByRate = async (rating) => {
 };
 
 const convertDate = (date) => {
-  const [day, month, year] = date.split('/');
-  return new Date(`${year}-${month}-${day}`);
+  if (date) {
+    const [day, month, year] = date.split('/');
+    return new Date(`${year}-${month}-${day}`);
+  }
 };
 
 const searchByDate = async (date) => {
@@ -23,9 +24,9 @@ const searchByDate = async (date) => {
     const searchDate = convertDate(date);
     const watchedDate = convertDate(talk.watchedAt);
     return (
-      watchedDate.getDate() === searchDate.getDate() &&
-      watchedDate.getMonth() === searchDate.getMonth() &&
-      watchedDate.getFullYear() === searchDate.getFullYear()
+      watchedDate.getDate() === searchDate.getDate()
+      && watchedDate.getMonth() === searchDate.getMonth()
+      && watchedDate.getFullYear() === searchDate.getFullYear()
     );
   });
   return filteredTalkers;
@@ -35,8 +36,8 @@ const searchByNameAndRate = async (name, rate) => {
   const talkers = await readJsonFile();
   return talkers.filter(
     (talker) =>
-      talker.name.toLowerCase().includes(name.toLowerCase()) &&
-      talker.talk.rate === rate
+      talker.name.toLowerCase().includes(name.toLowerCase())
+      && talker.talk.rate === rate,
   );
 };
 
@@ -44,20 +45,18 @@ const filterByMultipleProps = async (name, rate, date) => {
   const talkers = await readJsonFile();
 
   const filteredByName = talkers.filter((talker) =>
-    talker.name.toLowerCase().includes(name.toLowerCase())
-  );
+    talker.name.toLowerCase().includes(name.toLowerCase()));
 
   const filteredByRate = talkers.filter(({ talk }) => talk.rate === rate);
 
   const filteredByWatchedAt = talkers.filter(
     ({ talk }) =>
-      convertDate(talk.watchedAt).toDateString() === date.toDateString()
+      convertDate(talk.watchedAt).toDateString() === date.toDateString(),
   );
 
   const filteredArrays = [filteredByName, filteredByRate, filteredByWatchedAt];
   const result = filteredArrays.reduce((acc, curr) =>
-    acc.filter((obj) => curr.includes(obj))
-  );
+    acc.filter((obj) => curr.includes(obj)));
 
   return result;
 };
@@ -72,18 +71,16 @@ const filterByNameAndDate = async (name, date) => {
   const convertedDate = convertDate(date);
 
   const filteredByName = talkers.filter((talker) =>
-    talker.name.toLowerCase().includes(name.toLowerCase())
-  );
+    talker.name.toLowerCase().includes(name.toLowerCase()));
 
   const filteredByWatchedAt = talkers.filter(
     ({ talk }) =>
-      convertDate(talk.watchedAt).toDateString() ===
-      convertedDate.toDateString()
+      convertDate(talk.watchedAt).toDateString()
+      === convertedDate.toDateString(),
   );
 
   const result = filteredByName.filter((talker) =>
-    filteredByWatchedAt.includes(talker)
-  );
+    filteredByWatchedAt.includes(talker));
 
   return result;
 };
@@ -93,8 +90,8 @@ function findById(objectsList, id) {
 }
 
 function refactorData(obj) {
-  const { talk_watched_at, talk_rate, ...rest } = obj;
-  const talk = { watchedAt: talk_watched_at, rate: talk_rate };
+  const { talk_watched_at: watchedAt, talk_rate: rate, ...rest } = obj;
+  const talk = { watchedAt, rate };
   return { ...rest, talk };
 }
 
