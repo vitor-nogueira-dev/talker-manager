@@ -43,7 +43,7 @@ app.get(
       return res.status(200).json(talkersAll);
     }
   
-    const { action } = searchOptions.find(({ test }) => test(q, rate, date));
+    const { action } = searchOptions.find(({ search }) => search(q, rate, date));
     console.log(action, 'action');
 
     const talkers = await action(q, rate, date);
