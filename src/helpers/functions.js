@@ -53,8 +53,23 @@ function refactorData(obj) {
   return { ...rest, talk };
 }
 
+const validNumberRate = (rate) => {
+  if (rate && (!Number.isInteger(+rate) || +rate < 1 || +rate > 5)) {
+    return false;
+  }
+  return true;
+};
+
+const throwError = (message, status) => {
+  const err = new Error(message);
+  err.status = status;
+  throw err;
+};
+
 module.exports = {
   searchMultiple,
   findById,
   refactorData,
+  validNumberRate,
+  throwError,
 };
