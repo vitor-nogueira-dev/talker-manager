@@ -71,23 +71,23 @@
 ````
 git clone git@github.com:vitor-nogueira-dev/talker-manager.git
 ````
-1. Na pasta raiz do projeto, execute o seguinte comando para subir o container:
+2. Na pasta raiz do projeto, execute o seguinte comando para subir os containers:
 ```
 docker-compose up -d
 ``` 
-1. Entre no terminal `bash` do container:
+3. Entre no terminal `bash` do container:
 ````
 docker exec -it talker_manager bash
 ````
-1. Execute o comando para rodar o servidor com o `nodemon` 
+4. Execute o comando para rodar o servidor com o `nodemon` 
 ````
 npm run dev
 ````
-1. Se preferir rodar sem o `nodemon`
+5. Se preferir rodar sem o `nodemon`
 ````
 npm start
 ````
-1. Abra o software e/ou extensão e faça os testes conforme as rotas implementadas no diretório `routes`
+6. Abra o software e/ou extensão e faça os testes conforme as rotas implementadas no diretório `routes`
 ---
 ### Configuração do banco de dados
 1. O banco de dados `TalkerDB` é criado e populado quando o container é criado no passo `2`
