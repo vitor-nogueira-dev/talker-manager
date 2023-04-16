@@ -1,8 +1,4 @@
-const throwError = (message, status) => {
-  const err = new Error(message);
-  err.status = status;
-  throw err;
-};
+const { throwError } = require('../helpers/functions');
 
 const validateName = (name) => {
   if (!name) throwError('O campo "name" é obrigatório', 400);
@@ -36,7 +32,9 @@ const validateWatchedAt = (watchedAt) => {
 };
 
 const validateRate = (rate) => {
-  if (rate === undefined) { throwError('O campo "rate" é obrigatório', 400); }
+  if (rate === undefined) {
+    throwError('O campo "rate" é obrigatório', 400);
+  }
 
   if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
     throwError('O campo "rate" deve ser um número inteiro entre 1 e 5', 400);
@@ -62,7 +60,10 @@ const validateTalker = (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.status(error.status).json({ message: error.message });
+    return next({
+      message: error.message,
+      status: error.status,
+    });
   }
 };
 
