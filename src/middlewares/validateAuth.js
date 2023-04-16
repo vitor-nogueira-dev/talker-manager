@@ -1,15 +1,18 @@
+const { throwError } = require('../helpers/functions');
+const { validRegexToken } = require('../utils/constants');
+
 const validateAuthenticator = (req, res, next) => {
   const { authorization } = req.headers;
-  const tokenRegExp = /[a-z0-9]{16}/i;
 
   if (!authorization) {
-    return res.status(401).json({ message: 'Token não encontrado' });
+    return throwError('Token não encontrado', 401);
   }
 
-  if (!authorization.match(tokenRegExp) || authorization.length !== 16) {
-    return res.status(401).json({ message: 'Token inválido' });
+  if (!authorization.match(validRegexToken) || authorization.length !== 16) {
+    return throwError('Token inválido', 401);
   }
-  next();
+
+  return next();
 };
 
 module.exports = validateAuthenticator;
