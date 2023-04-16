@@ -1,8 +1,8 @@
 const express = require('express');
 const errorHandler = require('./middlewares/errorHandler');
 
-const login = require('./routes/login');
-const talkers = require('./routes/talkers');
+const login = require('./routes/login.routes');
+const talkers = require('./routes/talkers.routes');
 
 const app = express();
 app.use(express.json());
