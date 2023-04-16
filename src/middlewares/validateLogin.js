@@ -1,11 +1,11 @@
-const validEmail = require('./const');
+const { validRegexEmail } = require('../utils/constants');
 
 const validateEmail = (email) => {
   if (!email) {
     throw new Error('O campo "email" é obrigatório');
   }
 
-  const isEmail = validEmail.test(email);
+  const isEmail = validRegexEmail.test(email);
   
   if (!isEmail) {
     throw new Error('O "email" deve ter o formato "email@email.com"');
