@@ -6,21 +6,35 @@ const convertDate = (date) => {
     return new Date(`${year}-${month}-${day}`);
   }
 };
+const filterByName = (talkers, name) =>
+  talkers.filter((talker) =>
+    talker.name.toLowerCase().includes(name.toLowerCase()));
+
+const filterByRate = (talkers, rate) =>
+  talkers.filter((talker) => talker.talk.rate === rate);
+
+const filterByDate = (talkers, date) =>
+  talkers.filter(
+    (talker) =>
+      convertDate(talker.talk.watchedAt).toDateString() === date.toDateString(),
+  );
 
 const filterByMultipleProps = async (name, rate, date) => {
   const talkers = await readJsonFile();
   let filteredTalkers = talkers;
+
   if (name) {
-    filteredTalkers = filteredTalkers.filter((talker) =>
-      talker.name.toLowerCase().includes(name.toLowerCase()));
+    filteredTalkers = filterByName(filteredTalkers, name);
   }
+
   if (rate) {
-    filteredTalkers = filteredTalkers.filter((talker) => talker.talk.rate === rate);
+    filteredTalkers = filterByRate(filteredTalkers, rate);
   }
+
   if (date) {
-    filteredTalkers = filteredTalkers
-    .filter((talker) => convertDate(talker.talk.watchedAt).toDateString() === date.toDateString());
+    filteredTalkers = filterByDate(filteredTalkers, date);
   }
+
   return filteredTalkers;
 };
 

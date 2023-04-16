@@ -1,9 +1,9 @@
+const validEmail = require('./const');
+
 const validateEmail = (email) => {
   if (!email) {
     throw new Error('O campo "email" é obrigatório');
   }
-  
-  const validEmail = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
   const isEmail = validEmail.test(email);
   
