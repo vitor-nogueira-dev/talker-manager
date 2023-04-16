@@ -1,11 +1,20 @@
+const { validNumberRate } = require('../helpers/functions');
+
 const validateRatePatch = async (req, res, next) => {
   const { rate } = req.body;
   if (rate === undefined) {
-    return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
+    return next({ message: 'O campo "rate" é obrigatório', status: 400 });
   }
-  if (!Number.isInteger(+rate) || +rate < 1 || +rate > 5) {
-    return res.status(400).json({
+  if (rate === 0) {
+    return next({
       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
+      status: 400,
+    });
+  }
+  if (rate && !validNumberRate(rate)) {
+    return next({
+      message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
+      status: 400,
     });
   }
   return next();

@@ -1,8 +1,11 @@
-const validateRate = async (req, res, next) => {
+const { validNumberRate } = require('../helpers/functions');
+
+const validateRate = async (req, _res, next) => {
   const { rate } = req.query;
-  if (rate && (!Number.isInteger(+rate) || +rate < 1 || +rate > 5)) {
-    return res.status(400).json({
+  if (rate && !validNumberRate(rate)) {
+    return next({
       message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
+      status: 400,
     });
   }
 
